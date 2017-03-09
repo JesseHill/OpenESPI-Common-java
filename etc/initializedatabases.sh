@@ -18,3 +18,4 @@ mysql --user=root --password=password < tokenstore.sql
 # prepopulate tables 
 mysql --user=root --password=password < prepopulatesql_dc.sql
 mysql --user=root --password=password < prepopulatesql_tp.sql
+

@@ -672,6 +672,10 @@ public class ExportServiceImpl implements ExportService {
 			throws IOException {
 		String hrefFragment = "/Subscription/" + subscriptionId
 				+ "/UsagePoint/" + usagePointId;
+		System.out.println("ExportService exporting subscription id: " + subscriptionId + " usage point id: " + usagePointId);
+		EntryType entry = findEntryTypeXPath(subscriptionId, retailCustomerId,
+				usagePointId, 0L, 0L, UsagePoint.class);
+		System.out.println("Found entry: " + entry.toString());
 		exportEntry(
 				subscriptionId,
 				findEntryTypeXPath(subscriptionId, retailCustomerId,
@@ -684,6 +688,10 @@ public class ExportServiceImpl implements ExportService {
 			OutputStream stream, ExportFilter exportFilter) throws IOException {
 		// here we need to get only a subset of the usagepoints are obtained
 		String hrefFragment = "/Subscription/" + subscriptionId + "/UsagePoint";
+		System.out.println("ExportService exporting subscription id: " + subscriptionId);
+		EntryTypeIterator iterator = findEntryTypeIteratorXPath(subscriptionId, retailCustomerId,
+				0L, 0L, UsagePoint.class);
+		System.out.println("Entry iterator hasNext?: " + iterator.hasNext());
 		exportEntries(
 				subscriptionId,
 				findEntryTypeIteratorXPath(subscriptionId, retailCustomerId,
@@ -1227,12 +1235,14 @@ public class ExportServiceImpl implements ExportService {
 		Subscription subscription = null;
 		boolean valid = false;
 
+		System.out.println("findEntryTypeIteratorXPath start: " + subscriptionId + " id1: " + id1 + " id2: " + id2 + " id3: " + id3);
 		try {
 
 			if (!(subscriptionId.equals(0L))) {
 				subscription = resourceService.findById(subscriptionId,
 						Subscription.class);
 				Authorization authorization = subscription.getAuthorization();
+				System.out.println("findEntryTypeIteratorXPath found subscription: " + subscription + " thirdParty?: " + authorization.getThirdParty());
 				if (!(authorization.getThirdParty()
 						.contentEquals("third_party"))) {
 					// a special case (client credentials base) access. So the
@@ -1245,6 +1255,7 @@ public class ExportServiceImpl implements ExportService {
 						UsagePoint usagePoint = resourceService.findById(id2,
 								UsagePoint.class);
 						id1 = usagePoint.getRetailCustomer().getId();
+						System.out.println("findEntryTypeIteratorXPath adjusted id: " + id1);
 					}
 				}
 			}
@@ -1262,13 +1273,16 @@ public class ExportServiceImpl implements ExportService {
 				// subscription
 				valid = true;
 			}
+			System.out.println("findEntryTypeIteratorXPath valid: " + valid);
 
 			if (valid) {
 				if (!(id3.equals(0L))) {
+					System.out.println("findEntryTypeIteratorXPath finding by 3 ids - id1: " + id1 + " id2: " + id2 + " id3: " + id3);
 					temp = resourceService.findAllIdsByXPath(id1, id2, id3,
 							clazz);
 				} else {
 					if (!(id2.equals(0L))) {
+						System.out.println("findEntryTypeIteratorXPath finding by 2 ids - id1: " + id1 + " id2: " + id2);
 						temp = resourceService.findAllIdsByXPath(id1, id2,
 								clazz);
 					} else {
@@ -1276,18 +1290,22 @@ public class ExportServiceImpl implements ExportService {
 							// temp = resourceService.findAllIdsByXPath(id1,
 							// clazz);
 							// we just want the UsagePoints in the Subscription
+							System.out.println("findEntryTypeIteratorXPath finding all usage points in the subscription");
+							System.out.println("usage points length: " +  subscription.getUsagePoints().size());
 							for (UsagePoint up : subscription.getUsagePoints()) {
 								temp.add(up.getId());
 							}
 						} else {
 							// otherwise, just get all the RetailCustomers
+							System.out.println("findEntryTypeIteratorXPath getting all retail customers");
 							temp = resourceService
 									.findAllIdsByXPath(RetailCustomer.class);
 						}
 					}
 				}
 			}
-
+			System.out.println("Got temp: " + temp);
+			
 			result = (new EntryTypeIterator(resourceService, temp, clazz));
 
 		} catch (Exception e) {
