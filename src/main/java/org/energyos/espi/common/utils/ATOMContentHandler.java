@@ -144,16 +144,20 @@ public class ATOMContentHandler extends XMLFilterImpl {
 
 					// and update the min/max import range for later
 					// subscription publication
-					if ((minUpdated == null)
-							|| (result.getValue().getPublished().getValue()
-									.compare(minUpdated) == DatatypeConstants.LESSER)) {
-						minUpdated = result.getValue().getPublished()
-								.getValue();
-					}
-					if ((maxUpdated == null)
-							|| (result.getValue().getUpdated().getValue()
-									.compare(maxUpdated) == DatatypeConstants.GREATER)) {
-						maxUpdated = result.getValue().getUpdated().getValue();
+					try {
+						if ((minUpdated == null)
+								|| (result.getValue().getPublished().getValue()
+										.compare(minUpdated) == DatatypeConstants.LESSER)) {
+							minUpdated = result.getValue().getPublished()
+									.getValue();
+						}
+						if ((maxUpdated == null)
+								|| (result.getValue().getUpdated().getValue()
+										.compare(maxUpdated) == DatatypeConstants.GREATER)) {
+							maxUpdated = result.getValue().getUpdated().getValue();
+						}
+					} catch (Exception exc) {
+						System.err.println("Error updating min/max range: " + exc.getMessage());
 					}
 				}
 

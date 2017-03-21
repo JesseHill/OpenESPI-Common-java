@@ -179,10 +179,18 @@ public class EntryProcessorServiceImpl implements EntryProcessorService {
 					resource.getRelatedLinks().add(link);
 			}
 			resource.setDescription(entry.getTitle());
-			resource.setPublished(entry.getPublished().getValue()
+			try {
+			  resource.setPublished(entry.getPublished().getValue()
 					.toGregorianCalendar());
-			resource.setUpdated(entry.getUpdated().getValue()
+			} catch (Exception e) {
+				System.err.println("**** Expected published date:" + entry.getTitle());
+			}
+			try {
+   			  resource.setUpdated(entry.getUpdated().getValue()
 					.toGregorianCalendar());
+			} catch (Exception e) {
+				System.err.println("**** Expected updated date:" + entry.getTitle());
+			}
 		}
 
 	}
